@@ -25,7 +25,7 @@ export function Nav() {
             <rect width="32" height="32" rx="6" fill={C.dark} />
             <path d="M8 24L13 8h2l3 10 3-10h2l5 16h-3l-3-10-3 10h-2l-3-10-3 10H8z" fill="white" />
           </svg>
-          <span style={{ fontFamily: SYS, fontWeight: 600, fontSize: 17, color: C.dark, letterSpacing: -0.3 }}>LexAI</span>
+          <span style={{ fontFamily: SYS, fontWeight: 600, fontSize: 17, color: C.dark, letterSpacing: -0.3 }}>Agentlamy</span>
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 32 }} className="hidden-mobile">

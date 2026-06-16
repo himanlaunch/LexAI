@@ -90,7 +90,7 @@ function SavingsCalculator({ visible }: { visible: boolean }) {
             See exactly what you save
           </div>
           <div style={{ fontFamily: SYS, fontSize: 13, color: C.gray, letterSpacing: "-0.1px" }}>
-            Typical attorney cost range per document. LexAI: always $0.
+            Typical attorney cost range per document. Agentlamy: always $0.
           </div>
         </div>
 
@@ -120,7 +120,7 @@ function SavingsCalculator({ visible }: { visible: boolean }) {
             <tr style={{ borderBottom: `1px solid ${C.border}` }}>
               <th style={{ textAlign: "left" as const, fontWeight: 600, fontSize: 12, letterSpacing: "0.04em", textTransform: "uppercase" as const, color: C.gray, padding: "0 0 12px", paddingRight: 16 }}>Document</th>
               <th style={{ textAlign: "right" as const, fontWeight: 600, fontSize: 12, letterSpacing: "0.04em", textTransform: "uppercase" as const, color: C.gray, padding: "0 0 12px", paddingRight: 16, whiteSpace: "nowrap" as const }}>Law Firm (typical range)</th>
-              <th style={{ textAlign: "right" as const, fontWeight: 600, fontSize: 12, letterSpacing: "0.04em", textTransform: "uppercase" as const, color: "#34c759", padding: "0 0 12px", whiteSpace: "nowrap" as const }}>LexAI</th>
+              <th style={{ textAlign: "right" as const, fontWeight: 600, fontSize: 12, letterSpacing: "0.04em", textTransform: "uppercase" as const, color: "#34c759", padding: "0 0 12px", whiteSpace: "nowrap" as const }}>Agentlamy</th>
             </tr>
           </thead>
           <tbody>
@@ -166,7 +166,7 @@ function SavingsCalculator({ visible }: { visible: boolean }) {
             Your estimated savings
           </div>
           <div style={{ fontFamily: SYS, fontSize: 13, color: C.gray, letterSpacing: "-0.1px" }}>
-            Full kit via law firm at <strong style={{ color: C.dark }}>${rate}/hr</strong> vs. LexAI
+            Full kit via law firm at <strong style={{ color: C.dark }}>${rate}/hr</strong> vs. Agentlamy
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
@@ -461,7 +461,7 @@ function StarterKitSection() {
               Get all 9 documents — complete kit
             </div>
             <div style={{ fontFamily: SYS, fontSize: 13, color: C.gray, marginTop: 3, letterSpacing: "-0.1px" }}>
-              Law firms charge $8,000–$15,000. LexAI does it in minutes.
+              Law firms charge $8,000–$15,000. Agentlamy does it in minutes.
             </div>
           </div>
           <Link href="/documents" style={{
@@ -606,7 +606,7 @@ function CTA() {
           Ready to get started?
         </h2>
         <p style={{ fontFamily: SYS, fontSize: 17, letterSpacing: "-0.2px", color: C.gray, margin: "0 0 36px", lineHeight: 1.55 }}>
-          Join thousands of founders, startups, and enterprises using LexAI to handle their legal work faster and for far less.
+          Join thousands of founders, startups, and enterprises using Agentlamy to handle their legal work faster and for far less.
         </p>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" as const }}>
           <Link href="/documents" style={{

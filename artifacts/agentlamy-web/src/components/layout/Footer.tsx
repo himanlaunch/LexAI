@@ -42,7 +42,7 @@ export function Footer() {
                 <rect width="32" height="32" rx="6" fill="rgba(255,255,255,0.12)" />
                 <path d="M8 24L13 8h2l3 10 3-10h2l5 16h-3l-3-10-3 10h-2l-3-10-3 10H8z" fill="white" />
               </svg>
-              <span style={{ fontFamily: SYS, fontWeight: 600, fontSize: 17, color: C.white, letterSpacing: -0.3 }}>LexAI</span>
+              <span style={{ fontFamily: SYS, fontWeight: 600, fontSize: 17, color: C.white, letterSpacing: -0.3 }}>Agentlamy</span>
             </div>
             <p style={{ fontFamily: SYS, fontSize: 13, lineHeight: 1.6, maxWidth: 240, color: "rgba(255,255,255,0.45)", letterSpacing: "-0.1px" }}>
               The power of a full-service law firm at a fraction of the cost. Powered by specialized AI.
@@ -65,7 +65,7 @@ export function Footer() {
           ))}
         </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 28, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" as const, gap: 12 }}>
-          <div style={{ fontFamily: SYS, fontSize: 12, letterSpacing: "-0.1px", color: "rgba(255,255,255,0.35)" }}>© 2026 LexAI Inc. All rights reserved.</div>
+          <div style={{ fontFamily: SYS, fontSize: 12, letterSpacing: "-0.1px", color: "rgba(255,255,255,0.35)" }}>© 2026 Agentlamy Inc. All rights reserved.</div>
           <div style={{ fontFamily: SYS, fontSize: 12, letterSpacing: "-0.1px", color: "rgba(255,255,255,0.35)" }}>Made with specialized AI. Not a law firm.</div>
         </div>
       </div>

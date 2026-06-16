@@ -237,7 +237,7 @@ function StepCard({
                 <div style={{ fontFamily: SYS, fontSize: 14, fontWeight: 600, color: C.dark }}>{step.lawFirmCost}</div>
               </div>
               <div>
-                <div style={{ fontFamily: SYS, fontSize: 11, color: C.gray, letterSpacing: "-0.05px" }}>LexAI cost</div>
+                <div style={{ fontFamily: SYS, fontSize: 11, color: C.gray, letterSpacing: "-0.05px" }}>Agentlamy cost</div>
                 <div style={{ fontFamily: SYS, fontSize: 14, fontWeight: 700, color: C.green }}>$0</div>
               </div>
             </div>
@@ -255,7 +255,7 @@ function StepCard({
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = C.blue; }}
               data-testid={`generate-${step.id}`}
             >
-              <Sparkles size={13} /> Generate with LexAI
+              <Sparkles size={13} /> Generate with Agentlamy
             </Link>
           </div>
         </div>
@@ -397,7 +397,7 @@ function RoundSummary({
           )}
 
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", paddingTop: 10, borderTop: `1px solid ${C.border}` }}>
-            <span style={{ fontFamily: SYS, fontSize: 13, fontWeight: 600, color: C.dark }}>LexAI total</span>
+            <span style={{ fontFamily: SYS, fontSize: 13, fontWeight: 600, color: C.dark }}>Agentlamy total</span>
             <span style={{ fontFamily: SYS, fontSize: 22, fontWeight: 700, letterSpacing: "-0.6px", color: C.green }}>$0</span>
           </div>
         </div>
@@ -474,7 +474,7 @@ export function Fundraising() {
               Fundraising Suite
             </h1>
             <p style={{ fontFamily: SYS, fontSize: 17, letterSpacing: "-0.2px", color: C.gray, maxWidth: 560, lineHeight: 1.55, margin: 0 }}>
-              Every document your seed round requires — in the right order. Check off each step as you complete it, and generate the documents instantly with LexAI.
+              Every document your seed round requires — in the right order. Check off each step as you complete it, and generate the documents instantly with Agentlamy.
             </p>
           </div>
 

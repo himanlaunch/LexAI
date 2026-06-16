@@ -28,12 +28,12 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 
 ## Artifacts
 
-### LexAI Web (`artifacts/lexai-web`)
+### Agentlamy Web (`artifacts/agentlamy-web`)
 - **Type**: React + Vite SPA
 - **Preview path**: `/` (root)
-- **Workflow**: `LexAI` — runs on port 5000 via `cd artifacts/lexai-web && PORT=5000 BASE_PATH=/ node_modules/.bin/vite --config vite.config.ts --host 0.0.0.0`
+- **Workflow**: `Agentlamy` — runs on port 5000 via `cd artifacts/agentlamy-web && PORT=5000 BASE_PATH=/ node_modules/.bin/vite --config vite.config.ts --host 0.0.0.0`
 - **Routes**:
-  - `/` — Landing page (faithful reproduction of the LexAI mockup)
+  - `/` — Landing page (faithful reproduction of the Agentlamy mockup)
   - `/services` — All legal services grid + practice areas
   - `/documents` — Document templates with Generate buttons
   - `/dashboard` — Stats cards and recent activity
@@ -48,7 +48,7 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 ### Mockup Sandbox (`artifacts/mockup-sandbox`)
 - **Type**: Design mockup sandbox
 - **Preview path**: `/__mockup`
-- Contains the original LexAI landing page mockup at `src/components/mockups/lexai-landing/LandingPage.tsx`
+- Contains the original Agentlamy landing page mockup at `src/components/mockups/agentlamy-landing/LandingPage.tsx`
 
 ### API Server (`artifacts/api-server`)
 - **Type**: Express 5 API
@@ -57,5 +57,5 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 
 ## Notes
 
-- The LexAI workflow uses direct Vite invocation (`node_modules/.bin/vite`) instead of `pnpm run dev` to work around a port detection issue with the platform's workflow health checker when using pnpm filter.
-- The artifact.toml for lexai-web is set to port 5000, matching the LexAI workflow.
+- The Agentlamy workflow uses direct Vite invocation (`node_modules/.bin/vite`) instead of `pnpm run dev` to work around a port detection issue with the platform's workflow health checker when using pnpm filter.
+- The artifact.toml for agentlamy-web is set to port 5000, matching the Agentlamy workflow.

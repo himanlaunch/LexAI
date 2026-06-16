@@ -56,8 +56,8 @@ const serviceFields: Record<ServiceKey, { title: string; subtitle: string; field
     title: "Trademark Application",
     subtitle: "We'll run a clearance search and prepare a complete USPTO trademark application.",
     fields: [
-      { id: "mark",   label: "Mark Name",            placeholder: "e.g. LexAI", type: "text" },
-      { id: "owner",  label: "Owner / Applicant",    placeholder: "e.g. LexAI Inc.", type: "text" },
+      { id: "mark",   label: "Mark Name",            placeholder: "e.g. Agentlamy", type: "text" },
+      { id: "owner",  label: "Owner / Applicant",    placeholder: "e.g. Agentlamy Inc.", type: "text" },
       { id: "goods",  label: "Goods & Services",     placeholder: "e.g. AI-powered legal document software, Class 42", type: "text" },
       { id: "use",    label: "Use Status",            placeholder: "",  type: "select", options: ["Already in use in commerce", "Intent to use"] },
     ],
@@ -139,7 +139,7 @@ ABSTRACT
 [A concise summary of the invention will be inserted here based on the description provided.]
 
 ───────────────────────────
-PREPARED BY LEXAI • NOT LEGAL ADVICE
+PREPARED BY AGENTLAMY • NOT LEGAL ADVICE
 This draft is for review purposes. Consult a registered patent attorney before filing.`,
 
   "Trademarks": `UNITED STATES PATENT AND TRADEMARK OFFICE
@@ -174,7 +174,7 @@ CLEARANCE SEARCH SUMMARY
 • Recommendation: Proceed with filing
 
 ───────────────────────────
-PREPARED BY LEXAI • NOT LEGAL ADVICE`,
+PREPARED BY AGENTLAMY • NOT LEGAL ADVICE`,
 
   "Contracts": `[CONTRACT TYPE]
 
@@ -216,7 +216,7 @@ PARTY A: _________________________ Date: _______
 PARTY B: _________________________ Date: _______
 
 ───────────────────────────
-PREPARED BY LEXAI • NOT LEGAL ADVICE`,
+PREPARED BY AGENTLAMY • NOT LEGAL ADVICE`,
 
   "Privacy & Compliance": `PRIVACY POLICY
 
@@ -258,7 +258,7 @@ Effective Date: May 3, 2026
    For privacy-related inquiries: privacy@[company].com
 
 ───────────────────────────
-PREPARED BY LEXAI • GDPR & CCPA COMPLIANT TEMPLATE
+PREPARED BY AGENTLAMY • GDPR & CCPA COMPLIANT TEMPLATE
 Not legal advice. Review with counsel before publishing.`,
 
   "Startup Docs": `[DOCUMENT TYPE]
@@ -303,7 +303,7 @@ SIGNATURES:
 [Founder 2]: _________________________ Date: _______
 
 ───────────────────────────
-PREPARED BY LEXAI • NOT LEGAL ADVICE`,
+PREPARED BY AGENTLAMY • NOT LEGAL ADVICE`,
 
   "Business Formation": `[ENTITY TYPE] OPERATING AGREEMENT / FORMATION DOCUMENTS
 
@@ -348,7 +348,7 @@ SIGNATURES:
 [Member 2]: _________________________ Date: _______
 
 ───────────────────────────
-PREPARED BY LEXAI • NOT LEGAL ADVICE
+PREPARED BY AGENTLAMY • NOT LEGAL ADVICE
 File Articles of Organization / Incorporation with the Secretary of State separately.`,
 };
 
