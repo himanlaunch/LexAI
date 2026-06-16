@@ -1,0 +1,9 @@
+.agents
+.config
+.local
+.replit
+.replitignore
+replit.md
+**/node_modules
+**/dist
+**/*.tsbuildinfo
