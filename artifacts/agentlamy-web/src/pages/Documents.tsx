@@ -37,6 +37,13 @@ type GenerationOverrides = {
 
 type DownloadFormat = "txt" | "docx" | "pdf";
 
+type CustomField = {
+  id: string;
+  label: string;
+  placeholder: string;
+  multiline?: boolean;
+};
+
 const sampleDocs: DocumentTemplate[] = [
   { title: "Non-Disclosure Agreement", category: "Contracts" },
   { title: "Offer Letter", category: "Employment" },
@@ -59,6 +66,13 @@ const sampleDocs: DocumentTemplate[] = [
   { title: "W-9 Request Template", category: "Tax" },
   { title: "83(b) Election Letter", category: "Corporate Governance" },
   { title: "BOI Report", category: "Federal Compliance" },
+  { title: "409A Valuation Summary", category: "Fundraising" },
+  { title: "Board Consent — Authorize Financing", category: "Fundraising" },
+  { title: "SAFE Agreement", category: "Fundraising" },
+  { title: "SAFE Side Letter", category: "Fundraising" },
+  { title: "Cap Table Summary", category: "Fundraising" },
+  { title: "Stockholder Written Consent", category: "Fundraising" },
+  { title: "Closing Board Consent", category: "Fundraising" },
 ];
 
 const inputStyle = {
@@ -72,6 +86,75 @@ const inputStyle = {
   borderRadius: 10,
   padding: "11px 12px",
   outline: "none",
+};
+
+const defaultFields: CustomField[] = [
+  { id: "parties", label: "Parties involved", placeholder: "Names of people, companies, investors, employees, or agencies involved" },
+  { id: "effectiveDate", label: "Effective date", placeholder: "e.g. July 1, 2026" },
+  { id: "keyTerms", label: "Key terms", placeholder: "Any must-have terms, thresholds, obligations, or exceptions", multiline: true },
+];
+
+const documentFields: Record<string, CustomField[]> = {
+  "Non-Disclosure Agreement": [
+    { id: "disclosingParty", label: "Disclosing party", placeholder: "e.g. Agentlamy Inc. or both parties" },
+    { id: "receivingParty", label: "Receiving party", placeholder: "e.g. Partner company or contractor name" },
+    { id: "purpose", label: "Purpose of disclosure", placeholder: "e.g. product partnership discussions" },
+    { id: "confidentialityTerm", label: "Confidentiality term", placeholder: "e.g. 2 years, 5 years, indefinite for trade secrets" },
+  ],
+  "Offer Letter": [
+    { id: "candidateName", label: "Candidate name", placeholder: "e.g. Jane Doe" },
+    { id: "roleTitle", label: "Role title", placeholder: "e.g. Founding Engineer" },
+    { id: "compensation", label: "Compensation", placeholder: "e.g. $140,000 salary plus 0.25% equity" },
+    { id: "startDate", label: "Start date", placeholder: "e.g. August 5, 2026" },
+  ],
+  "IP Assignment Agreement": [
+    { id: "assignor", label: "Assignor", placeholder: "Person or company assigning IP" },
+    { id: "assignee", label: "Assignee", placeholder: "Company receiving IP rights" },
+    { id: "ipDescription", label: "IP description", placeholder: "Code, designs, inventions, trademarks, data, or content being assigned", multiline: true },
+    { id: "consideration", label: "Consideration", placeholder: "e.g. employment, equity, $10, or other consideration" },
+  ],
+  "Co-founder Agreement": [
+    { id: "founders", label: "Founder names", placeholder: "e.g. Alex Smith, Priya Shah, Marco Lee" },
+    { id: "equitySplit", label: "Equity split", placeholder: "e.g. Alex 45%, Priya 35%, Marco 20%" },
+    { id: "vestingSchedule", label: "Vesting schedule", placeholder: "e.g. 4 years with 1-year cliff" },
+    { id: "rolesResponsibilities", label: "Roles and responsibilities", placeholder: "CEO handles fundraising; CTO handles product and engineering", multiline: true },
+  ],
+  "Terms of Service": [
+    { id: "productName", label: "Product or service", placeholder: "e.g. AI legal document generation platform" },
+    { id: "userTypes", label: "User types", placeholder: "e.g. founders, startups, businesses" },
+    { id: "paymentTerms", label: "Payment terms", placeholder: "e.g. subscription, one-time fee, free beta" },
+    { id: "prohibitedUses", label: "Prohibited uses", placeholder: "Activities users cannot do on the platform", multiline: true },
+  ],
+  "Privacy Policy": [
+    { id: "websiteApp", label: "Website or app", placeholder: "e.g. agentlamy.com" },
+    { id: "dataCollected", label: "Data collected", placeholder: "Account, billing, usage, uploaded documents, website URLs", multiline: true },
+    { id: "dataSharing", label: "Data sharing", placeholder: "Processors, payment providers, analytics, AI providers" },
+    { id: "privacyContact", label: "Privacy contact", placeholder: "e.g. privacy@company.com" },
+  ],
+  "Board Resolutions": [
+    { id: "meetingDate", label: "Meeting or consent date", placeholder: "e.g. June 16, 2026" },
+    { id: "directors", label: "Directors approving", placeholder: "Names of board members" },
+    { id: "approvalItems", label: "Items to approve", placeholder: "Financing, officer appointment, bank account, equity grant", multiline: true },
+    { id: "authorizedOfficer", label: "Authorized officer", placeholder: "Officer authorized to execute documents" },
+  ],
+  "SAFE Agreement": [
+    { id: "investorName", label: "Investor name", placeholder: "e.g. Acme Ventures LP" },
+    { id: "purchaseAmount", label: "Purchase amount", placeholder: "e.g. $250,000" },
+    { id: "valuationCap", label: "Valuation cap", placeholder: "e.g. $8,000,000" },
+    { id: "discountRate", label: "Discount rate", placeholder: "e.g. 20%" },
+  ],
+  "83(b) Election Letter": [
+    { id: "taxpayerName", label: "Taxpayer name", placeholder: "Founder or employee making the election" },
+    { id: "grantDate", label: "Stock grant date", placeholder: "e.g. June 1, 2026" },
+    { id: "shares", label: "Shares and class", placeholder: "e.g. 2,000,000 shares of common stock" },
+    { id: "fairMarketValue", label: "Fair market value", placeholder: "e.g. $0.0001 per share" },
+  ],
+  "BOI Report": [
+    { id: "reportingCompany", label: "Reporting company", placeholder: "Legal entity name" },
+    { id: "beneficialOwners", label: "Beneficial owners", placeholder: "Owners with 25%+ or substantial control", multiline: true },
+    { id: "companyApplicant", label: "Company applicant", placeholder: "Person who filed or directed formation" },
+    { id: "finCenId", label: "FinCEN ID details", placeholder: "Known FinCEN IDs, if any" },
+  ],
 };
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -92,6 +175,44 @@ function cleanGeneratedText(value: string) {
     .trim();
 }
 
+function getFieldsForDocument(documentTitle: string) {
+  if (documentFields[documentTitle]) return documentFields[documentTitle];
+
+  if (/privacy|cookie/i.test(documentTitle)) return documentFields["Privacy Policy"];
+  if (/terms/i.test(documentTitle)) return documentFields["Terms of Service"];
+  if (/safe/i.test(documentTitle)) return documentFields["SAFE Agreement"];
+  if (/board|consent|resolution/i.test(documentTitle)) return documentFields["Board Resolutions"];
+  if (/tax|1099|w-9|payroll|franchise/i.test(documentTitle)) {
+    return [
+      { id: "taxYear", label: "Tax year", placeholder: "e.g. 2026" },
+      { id: "taxpayer", label: "Taxpayer or company", placeholder: "Legal taxpayer/company name" },
+      { id: "filingJurisdiction", label: "Filing jurisdiction", placeholder: "Federal, Delaware, California, New York, etc." },
+      { id: "taxDetails", label: "Tax or filing details", placeholder: "Amounts, deadlines, account IDs, payroll providers, contractors, or filing assumptions", multiline: true },
+    ];
+  }
+  if (/agent|annual report|statement|qualification|biennial|boi/i.test(documentTitle)) {
+    return [
+      { id: "entityName", label: "Entity legal name", placeholder: "Company legal name" },
+      { id: "entityId", label: "Entity or state ID", placeholder: "Known state file number or entity ID" },
+      { id: "registeredAgent", label: "Registered agent or address", placeholder: "Registered agent name and address" },
+      { id: "filingDetails", label: "Filing details", placeholder: "States, deadlines, officers, addresses, ownership, or applicant info", multiline: true },
+    ];
+  }
+
+  return defaultFields;
+}
+
+function formatCustomFieldContext(fields: CustomField[], values: Record<string, string>) {
+  const lines = fields
+    .map(field => {
+      const value = values[field.id]?.trim();
+      return value ? `${field.label}: ${value}` : "";
+    })
+    .filter(Boolean);
+
+  return lines.length ? `Document-specific details:\n${lines.join("\n")}` : "";
+}
+
 export function Documents() {
   const search = useSearch();
   const params = new URLSearchParams(search);
@@ -106,6 +227,7 @@ export function Documents() {
   const [companyName, setCompanyName] = useState("");
   const [jurisdiction, setJurisdiction] = useState("Delaware, United States");
   const [additionalContext, setAdditionalContext] = useState("");
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
   const [generatedDocument, setGeneratedDocument] = useState<GeneratedDocument | null>(null);
   const [generationError, setGenerationError] = useState("");
   const [researchError, setResearchError] = useState("");
@@ -115,6 +237,12 @@ export function Documents() {
 
   const isGenerating = generatingTitle.length > 0;
   const isBusy = isGenerating || isResearching;
+  const currentFields = getFieldsForDocument(selectedDoc?.title ?? "");
+  const customFieldContext = formatCustomFieldContext(currentFields, customFieldValues);
+
+  function updateCustomField(id: string, value: string) {
+    setCustomFieldValues(previous => ({ ...previous, [id]: value }));
+  }
 
   function scrollToHighlighted() {
     highlightedRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -133,7 +261,12 @@ export function Documents() {
 
     const resolvedCompanyName = overrides.companyName ?? companyName;
     const resolvedJurisdiction = overrides.jurisdiction ?? jurisdiction;
-    const resolvedAdditionalContext = overrides.additionalContext ?? additionalContext;
+    const resolvedAdditionalContext = [
+      customFieldContext,
+      overrides.additionalContext ?? additionalContext,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
 
     setSelectedDoc(doc);
     setGeneratedDocument(null);
@@ -441,6 +574,37 @@ export function Documents() {
                 <div>
                   <FieldLabel>Jurisdiction</FieldLabel>
                   <input value={jurisdiction} onChange={e => setJurisdiction(e.target.value)} placeholder="e.g. Delaware, United States" style={inputStyle} data-testid="input-jurisdiction" />
+                </div>
+              </div>
+
+              <div style={{ marginTop: 18 }}>
+                <div style={{ fontFamily: SYS, fontSize: 12, fontWeight: 700, color: C.dark, marginBottom: 10, letterSpacing: "0.02em", textTransform: "uppercase" as const }}>
+                  {selectedDoc.title} details
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 14 }}>
+                  {currentFields.map(field => (
+                    <div key={field.id} style={{ gridColumn: field.multiline ? "1 / -1" : undefined }}>
+                      <FieldLabel>{field.label}</FieldLabel>
+                      {field.multiline ? (
+                        <textarea
+                          value={customFieldValues[field.id] ?? ""}
+                          onChange={e => updateCustomField(field.id, e.target.value)}
+                          placeholder={field.placeholder}
+                          rows={3}
+                          style={{ ...inputStyle, resize: "vertical" as const, lineHeight: 1.5 }}
+                          data-testid={`input-custom-${field.id}`}
+                        />
+                      ) : (
+                        <input
+                          value={customFieldValues[field.id] ?? ""}
+                          onChange={e => updateCustomField(field.id, e.target.value)}
+                          placeholder={field.placeholder}
+                          style={inputStyle}
+                          data-testid={`input-custom-${field.id}`}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
