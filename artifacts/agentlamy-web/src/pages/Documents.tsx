@@ -3,7 +3,7 @@ import { useSearch } from "wouter";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { C, SYS } from "@/lib/constants";
-import { Copy, Download, FileText, LoaderCircle, Plus, Sparkles } from "lucide-react";
+import { Copy, Download, FileText, LoaderCircle, Plus, Search, Sparkles } from "lucide-react";
 
 type DocumentTemplate = {
   title: string;
@@ -15,6 +15,24 @@ type GeneratedDocument = {
   category: string;
   provider: string;
   content: string;
+};
+
+type ResearchResult = {
+  sourceUrl: string;
+  provider: string;
+  companyName: string;
+  jurisdiction: string;
+  summary: string;
+  discoveredFacts: string[];
+  additionalContext: string;
+  error?: string;
+  details?: string;
+};
+
+type GenerationOverrides = {
+  companyName?: string;
+  jurisdiction?: string;
+  additionalContext?: string;
 };
 
 const sampleDocs: DocumentTemplate[] = [
@@ -72,15 +90,19 @@ export function Documents() {
     : null;
 
   const [selectedDoc, setSelectedDoc] = useState<DocumentTemplate | null>(prefillDoc ?? null);
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [jurisdiction, setJurisdiction] = useState("Delaware, United States");
   const [additionalContext, setAdditionalContext] = useState("");
   const [generatedDocument, setGeneratedDocument] = useState<GeneratedDocument | null>(null);
   const [generationError, setGenerationError] = useState("");
+  const [researchError, setResearchError] = useState("");
   const [generatingTitle, setGeneratingTitle] = useState("");
+  const [isResearching, setIsResearching] = useState(false);
   const highlightedRowRef = useRef<HTMLDivElement>(null);
 
   const isGenerating = generatingTitle.length > 0;
+  const isBusy = isGenerating || isResearching;
 
   function scrollToHighlighted() {
     highlightedRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -91,10 +113,15 @@ export function Documents() {
     setSelectedDoc(doc);
     setGeneratedDocument(null);
     setGenerationError("");
+    setResearchError("");
   }
 
-  async function generateDocument(doc = selectedDoc) {
+  async function generateDocument(doc = selectedDoc, overrides: GenerationOverrides = {}) {
     if (!doc || isGenerating) return;
+
+    const resolvedCompanyName = overrides.companyName ?? companyName;
+    const resolvedJurisdiction = overrides.jurisdiction ?? jurisdiction;
+    const resolvedAdditionalContext = overrides.additionalContext ?? additionalContext;
 
     setSelectedDoc(doc);
     setGeneratedDocument(null);
@@ -108,9 +135,9 @@ export function Documents() {
         body: JSON.stringify({
           documentType: doc.title,
           category: doc.category,
-          companyName: companyName || "[Company Name]",
-          jurisdiction: jurisdiction || "Delaware, United States",
-          additionalContext,
+          companyName: resolvedCompanyName || "[Company Name]",
+          jurisdiction: resolvedJurisdiction || "Delaware, United States",
+          additionalContext: resolvedAdditionalContext,
         }),
       });
 
@@ -136,6 +163,64 @@ export function Documents() {
       setGenerationError(error instanceof Error ? error.message : "Document generation failed.");
     } finally {
       setGeneratingTitle("");
+    }
+  }
+
+  async function researchUrlAndGenerate() {
+    const targetDoc = selectedDoc ?? sampleDocs[0];
+    const normalizedWebsiteUrl = websiteUrl.trim();
+
+    if (!normalizedWebsiteUrl || isBusy) return;
+
+    setSelectedDoc(targetDoc);
+    setResearchError("");
+    setGenerationError("");
+    setGeneratedDocument(null);
+    setIsResearching(true);
+
+    try {
+      const response = await fetch("/api/documents/research-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: normalizedWebsiteUrl,
+          documentType: targetDoc.title,
+          category: targetDoc.category,
+        }),
+      });
+
+      const data = await response.json().catch(() => null) as ResearchResult | null;
+
+      if (!response.ok) {
+        throw new Error(data?.details || data?.error || `Website research failed with status ${response.status}`);
+      }
+
+      if (!data) {
+        throw new Error("Website research returned an empty response.");
+      }
+
+      const nextCompanyName = data.companyName || companyName;
+      const nextJurisdiction = data.jurisdiction || jurisdiction || "Delaware, United States";
+      const nextAdditionalContext = [
+        data.additionalContext,
+        additionalContext ? `User notes:\n${additionalContext}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      setCompanyName(nextCompanyName);
+      setJurisdiction(nextJurisdiction);
+      setAdditionalContext(nextAdditionalContext);
+      setIsResearching(false);
+
+      await generateDocument(targetDoc, {
+        companyName: nextCompanyName,
+        jurisdiction: nextJurisdiction,
+        additionalContext: nextAdditionalContext,
+      });
+    } catch (error) {
+      setResearchError(error instanceof Error ? error.message : "Website research failed.");
+      setIsResearching(false);
     }
   }
 
@@ -211,14 +296,14 @@ export function Documents() {
                   scrollToHighlighted();
                   void generateDocument(prefillDoc);
                 }}
-                disabled={isGenerating}
+                disabled={isBusy}
                 style={{
                   fontFamily: SYS, fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px",
                   color: C.white, backgroundColor: C.blue,
-                  border: "none", borderRadius: 980, padding: "8px 20px", cursor: isGenerating ? "default" : "pointer",
-                  transition: "background-color 0.2s", whiteSpace: "nowrap" as const, opacity: isGenerating ? 0.72 : 1,
+                  border: "none", borderRadius: 980, padding: "8px 20px", cursor: isBusy ? "default" : "pointer",
+                  transition: "background-color 0.2s", whiteSpace: "nowrap" as const, opacity: isBusy ? 0.72 : 1,
                 }}
-                onMouseEnter={e => { if (!isGenerating) (e.currentTarget as HTMLButtonElement).style.backgroundColor = C.blueDk; }}
+                onMouseEnter={e => { if (!isBusy) (e.currentTarget as HTMLButtonElement).style.backgroundColor = C.blueDk; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = C.blue; }}
                 data-testid="btn-generate-prefill"
               >
@@ -262,8 +347,49 @@ export function Documents() {
                   letterSpacing: "-0.05px",
                   whiteSpace: "nowrap" as const,
                 }}>
-                  {isGenerating ? "Working" : "Ready"}
+                  {isResearching ? "Researching" : isGenerating ? "Working" : "Ready"}
                 </span>
+              </div>
+
+              <div style={{ marginBottom: 16 }}>
+                <FieldLabel>Research from website URL</FieldLabel>
+                <div style={{ display: "flex", gap: 10, alignItems: "stretch", flexWrap: "wrap" as const }}>
+                  <input
+                    value={websiteUrl}
+                    onChange={e => setWebsiteUrl(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") void researchUrlAndGenerate();
+                    }}
+                    placeholder="Paste a company website URL, then search"
+                    style={{ ...inputStyle, flex: "1 1 280px", minWidth: 0 }}
+                    data-testid="input-website-url"
+                  />
+                  <button
+                    onClick={() => void researchUrlAndGenerate()}
+                    disabled={isBusy || !websiteUrl.trim()}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      fontFamily: SYS,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: C.white,
+                      backgroundColor: C.dark,
+                      border: "none",
+                      borderRadius: 10,
+                      padding: "0 18px",
+                      minHeight: 44,
+                      cursor: isBusy || !websiteUrl.trim() ? "default" : "pointer",
+                      opacity: isBusy || !websiteUrl.trim() ? 0.55 : 1,
+                    }}
+                    data-testid="btn-research-url"
+                  >
+                    {isResearching ? <LoaderCircle size={16} className="animate-spin" /> : <Search size={16} />}
+                    {isResearching ? "Searching" : "Search"}
+                  </button>
+                </div>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
@@ -289,6 +415,12 @@ export function Documents() {
                 />
               </div>
 
+              {researchError && (
+                <div style={{ marginTop: 16, border: "1px solid rgba(255,149,0,0.24)", backgroundColor: "rgba(255,149,0,0.08)", borderRadius: 12, padding: "13px 14px", color: "#995c00", fontFamily: SYS, fontSize: 13, lineHeight: 1.45 }} data-testid="research-error">
+                  {researchError}
+                </div>
+              )}
+
               {generationError && (
                 <div style={{ marginTop: 16, border: "1px solid rgba(255,59,48,0.22)", backgroundColor: "rgba(255,59,48,0.07)", borderRadius: 12, padding: "13px 14px", color: "#b42318", fontFamily: SYS, fontSize: 13, lineHeight: 1.45 }} data-testid="generation-error">
                   {generationError}
@@ -297,7 +429,7 @@ export function Documents() {
 
               <button
                 onClick={() => void generateDocument()}
-                disabled={isGenerating}
+                disabled={isBusy}
                 style={{
                   marginTop: 18,
                   display: "inline-flex",
@@ -312,13 +444,13 @@ export function Documents() {
                   border: "none",
                   borderRadius: 980,
                   padding: "11px 18px",
-                  cursor: isGenerating ? "default" : "pointer",
-                  opacity: isGenerating ? 0.72 : 1,
+                  cursor: isBusy ? "default" : "pointer",
+                  opacity: isBusy ? 0.72 : 1,
                 }}
                 data-testid="btn-generate-draft"
               >
-                {isGenerating ? <LoaderCircle size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                {isGenerating ? `Generating ${generatingTitle}` : "Generate Draft"}
+                {isBusy ? <LoaderCircle size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                {isResearching ? "Researching website" : isGenerating ? `Generating ${generatingTitle}` : "Generate Draft"}
               </button>
             </section>
           )}
@@ -385,16 +517,16 @@ export function Documents() {
                       </div>
                     </div>
 
-                    <button onClick={() => void generateDocument(doc)} disabled={isGenerating} style={{
+                    <button onClick={() => void generateDocument(doc)} disabled={isBusy} style={{
                       display: "inline-flex", alignItems: "center", gap: 6,
                       fontFamily: SYS, fontSize: 13, fontWeight: 500, letterSpacing: "-0.1px",
                       color: isHighlighted ? C.white : C.blue,
                       backgroundColor: isHighlighted ? C.blue : "transparent",
-                      border: `1.5px solid ${C.blue}`, borderRadius: 980, padding: "6px 16px", cursor: isGenerating ? "default" : "pointer",
-                      transition: "opacity 0.2s", whiteSpace: "nowrap", opacity: isGenerating && !isRowGenerating ? 0.45 : 1,
+                      border: `1.5px solid ${C.blue}`, borderRadius: 980, padding: "6px 16px", cursor: isBusy ? "default" : "pointer",
+                      transition: "opacity 0.2s", whiteSpace: "nowrap", opacity: isBusy && !isRowGenerating ? 0.45 : 1,
                     }}
-                      onMouseEnter={e => { if (!isGenerating) (e.currentTarget as HTMLButtonElement).style.opacity = "0.75"; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = isGenerating && !isRowGenerating ? "0.45" : "1"; }}
+                      onMouseEnter={e => { if (!isBusy) (e.currentTarget as HTMLButtonElement).style.opacity = "0.75"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = isBusy && !isRowGenerating ? "0.45" : "1"; }}
                       data-testid={`btn-generate-${i}`}
                     >
                       {isRowGenerating && <LoaderCircle size={13} className="animate-spin" />}
