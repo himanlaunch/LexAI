@@ -82,6 +82,16 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+function cleanGeneratedText(value: string) {
+  return value
+    .replace(/^---+$/gm, "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__(.*?)__/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .trim();
+}
+
 export function Documents() {
   const search = useSearch();
   const params = new URLSearchParams(search);
@@ -159,7 +169,7 @@ export function Documents() {
         documentType: data.documentType,
         category: data.category,
         provider: data.provider,
-        content: data.content,
+        content: cleanGeneratedText(data.content),
       });
     } catch (error) {
       setGenerationError(error instanceof Error ? error.message : "Document generation failed.");

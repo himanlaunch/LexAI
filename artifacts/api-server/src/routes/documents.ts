@@ -65,6 +65,8 @@ function escapePdfText(value: string) {
 function stripLightMarkdown(value: string) {
   return value
     .replace(/^---+$/gm, "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*[-*]\s+/gm, "• ")
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .replace(/__(.*?)__/g, "$1")
     .replace(/`([^`]+)`/g, "$1")
@@ -411,7 +413,7 @@ function buildMessages(body: Required<GenerateDocumentBody>): ChatMessage[] {
     {
       role: "system",
       content:
-        "You draft practical startup legal document first drafts. Return a structured, editable draft with placeholders where facts are missing. Include a short non-legal-advice note at the end. Do not invent executed facts, signatures, addresses, or registration numbers.",
+        "You draft practical startup legal document first drafts. Return plain document text only, not Markdown. Do not use # heading markers, code fences, tables, or decorative separators. Use clear uppercase section headings, numbered clauses, and placeholders where facts are missing. Include a short non-legal-advice note at the end. Do not invent executed facts, signatures, addresses, or registration numbers.",
     },
     {
       role: "user",
@@ -422,7 +424,7 @@ function buildMessages(body: Required<GenerateDocumentBody>): ChatMessage[] {
         `Jurisdiction: ${body.jurisdiction}`,
         `Additional context: ${body.additionalContext || "None provided"}`,
         "",
-        "Create a clean first draft with sections, defined terms, signature blocks where appropriate, and a concise checklist of missing details the user should confirm.",
+        "Create a clean first draft with sections, defined terms, signature blocks where appropriate, and a concise checklist of missing details the user should confirm. Output plain text only.",
       ].join("\n"),
     },
   ];
@@ -746,7 +748,7 @@ router.post("/documents/generate", async (req: Request, res: Response) => {
       "document generation started",
     );
 
-    const content = await callAi(aiConfig, buildMessages(normalizedBody), 2200);
+    const content = stripLightMarkdown(await callAi(aiConfig, buildMessages(normalizedBody), 2200));
 
     req.log.info(
       {
