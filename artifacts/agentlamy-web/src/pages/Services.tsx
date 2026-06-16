@@ -27,7 +27,7 @@ export function Services() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
               {services.map((svc, i) => (
-                <Link key={i} href="/documents" style={{
+                <Link key={i} href={`/documents?type=${encodeURIComponent(svc.label)}`} style={{
                   backgroundColor: C.white,
                   borderRadius: 18, padding: "28px 24px",
                   cursor: "pointer",
@@ -69,7 +69,7 @@ export function Services() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
               {practiceAreas.map((area, i) => (
-                <Link key={i} href="/documents" style={{
+                <Link key={i} href={`/documents?type=${encodeURIComponent(area)}`} style={{
                   backgroundColor: C.white,
                   border: `1px solid ${C.border}`,
                   borderRadius: 12, padding: "16px 20px", cursor: "pointer",

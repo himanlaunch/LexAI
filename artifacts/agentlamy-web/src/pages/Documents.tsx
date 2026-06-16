@@ -73,6 +73,12 @@ const sampleDocs: DocumentTemplate[] = [
   { title: "Cap Table Summary", category: "Fundraising" },
   { title: "Stockholder Written Consent", category: "Fundraising" },
   { title: "Closing Board Consent", category: "Fundraising" },
+  { title: "Patents", category: "Service" },
+  { title: "Trademarks", category: "Service" },
+  { title: "Contracts", category: "Service" },
+  { title: "Privacy & Compliance", category: "Service" },
+  { title: "Startup Docs", category: "Service" },
+  { title: "Business Formation", category: "Service" },
 ];
 
 const inputStyle = {
@@ -155,6 +161,198 @@ const documentFields: Record<string, CustomField[]> = {
     { id: "companyApplicant", label: "Company applicant", placeholder: "Person who filed or directed formation" },
     { id: "finCenId", label: "FinCEN ID details", placeholder: "Known FinCEN IDs, if any" },
   ],
+  "Registered Agent Authorization": [
+    { id: "entityName", label: "Entity legal name", placeholder: "Company legal name" },
+    { id: "registeredAgent", label: "Registered agent", placeholder: "Registered agent name" },
+    { id: "registeredOffice", label: "Registered office address", placeholder: "Street address for service of process" },
+    { id: "authorizedSigner", label: "Authorized signer", placeholder: "Officer or organizer signing authorization" },
+  ],
+  "Delaware Franchise Tax Filing": [
+    { id: "taxYear", label: "Tax year", placeholder: "e.g. 2026" },
+    { id: "delawareFileNumber", label: "Delaware file number", placeholder: "Known Delaware corporation file number" },
+    { id: "shareDetails", label: "Authorized shares and par value", placeholder: "e.g. 10,000,000 common shares at $0.0001 par", multiline: true },
+    { id: "grossAssets", label: "Gross assets", placeholder: "Total gross assets for assumed par value method, if known" },
+  ],
+  "CA Statement of Information": [
+    { id: "californiaEntityNumber", label: "California entity number", placeholder: "Known CA Secretary of State entity number" },
+    { id: "principalAddress", label: "Principal office address", placeholder: "Company street address" },
+    { id: "officersDirectors", label: "Officers and directors", placeholder: "Names, titles, and addresses", multiline: true },
+    { id: "serviceAgent", label: "Agent for service of process", placeholder: "Agent name and California address" },
+  ],
+  "Corporate Tax Preparation Checklist": [
+    { id: "taxYear", label: "Tax year", placeholder: "e.g. 2026" },
+    { id: "entityTaxType", label: "Entity tax type", placeholder: "C-Corp, S-Corp, LLC partnership, sole proprietor" },
+    { id: "financialRecords", label: "Financial records available", placeholder: "Books, bank statements, payroll, invoices, receipts", multiline: true },
+    { id: "taxAdvisor", label: "Tax preparer or advisor", placeholder: "CPA or internal owner responsible" },
+  ],
+  "Foreign Qualification Application": [
+    { id: "homeState", label: "Home jurisdiction", placeholder: "State/country where the company was formed" },
+    { id: "foreignState", label: "Qualification state", placeholder: "State where business authority is needed" },
+    { id: "businessActivities", label: "Business activities in state", placeholder: "Employees, customers, office, inventory, revenue, or other nexus", multiline: true },
+    { id: "stateAgent", label: "Registered agent in state", placeholder: "Agent name and address in qualification state" },
+  ],
+  "NY Biennial Statement": [
+    { id: "nyDosId", label: "NY DOS ID", placeholder: "Known Department of State ID" },
+    { id: "chiefExecutive", label: "Chief executive officer", placeholder: "CEO name and business address" },
+    { id: "serviceAddress", label: "Service of process address", placeholder: "Address where NY Secretary of State sends process" },
+    { id: "reportingPeriod", label: "Reporting period", placeholder: "Current biennial filing window" },
+  ],
+  "Annual Report": [
+    { id: "reportYear", label: "Report year", placeholder: "e.g. 2026" },
+    { id: "stateOfFiling", label: "State of filing", placeholder: "e.g. Delaware, Florida, Wyoming" },
+    { id: "officerDirectorInfo", label: "Officer/director info", placeholder: "Names, titles, and business addresses", multiline: true },
+    { id: "principalOffice", label: "Principal office", placeholder: "Current principal office address" },
+  ],
+  "1099-NEC Preparation Checklist": [
+    { id: "taxYear", label: "Tax year", placeholder: "e.g. 2026" },
+    { id: "contractors", label: "Contractors/vendors", placeholder: "Names, emails, EIN/SSN status, and amounts paid", multiline: true },
+    { id: "paymentThreshold", label: "Payment threshold", placeholder: "e.g. contractors paid $600 or more" },
+    { id: "filingMethod", label: "Filing method", placeholder: "IRS e-file, payroll provider, CPA, or internal filing" },
+  ],
+  "Estimated Tax Payment Guide": [
+    { id: "taxpayer", label: "Taxpayer", placeholder: "Company or individual responsible for payments" },
+    { id: "taxYear", label: "Tax year", placeholder: "e.g. 2026" },
+    { id: "estimatedIncome", label: "Estimated income/profit", placeholder: "Expected taxable income or profit" },
+    { id: "paymentSchedule", label: "Payment schedule", placeholder: "Quarterly dates, reminders, or preferred method", multiline: true },
+  ],
+  "Payroll Compliance Checklist": [
+    { id: "payrollStates", label: "Payroll states", placeholder: "States where employees are paid" },
+    { id: "employeeTypes", label: "Worker types", placeholder: "Full-time, part-time, contractors, remote employees" },
+    { id: "payrollProvider", label: "Payroll provider", placeholder: "Gusto, Rippling, ADP, internal, etc." },
+    { id: "complianceNeeds", label: "Compliance needs", placeholder: "Registrations, withholdings, posters, workers comp, benefits, final pay rules", multiline: true },
+  ],
+  "Sales Tax Nexus Analysis": [
+    { id: "statesSoldInto", label: "States sold into", placeholder: "Where customers are located" },
+    { id: "salesVolume", label: "Sales volume", placeholder: "Revenue and transaction count by state" },
+    { id: "productType", label: "Product/service type", placeholder: "SaaS, physical goods, services, marketplace sales" },
+    { id: "nexusFacts", label: "Nexus facts", placeholder: "Employees, contractors, inventory, events, affiliates, ads, marketplace activity", multiline: true },
+  ],
+  "W-9 Request Template": [
+    { id: "requestingCompany", label: "Requesting company", placeholder: "Company requesting W-9" },
+    { id: "recipientName", label: "Recipient/vendor", placeholder: "Person or vendor receiving request" },
+    { id: "purpose", label: "Purpose of request", placeholder: "Onboarding, 1099 prep, payment setup, compliance review" },
+    { id: "submissionInstructions", label: "Submission instructions", placeholder: "Where and when the completed W-9 should be sent" },
+  ],
+  "409A Valuation Summary": [
+    { id: "valuationDate", label: "Valuation date", placeholder: "e.g. June 30, 2026" },
+    { id: "commonShareValue", label: "Common share value", placeholder: "Fair market value per common share" },
+    { id: "capitalization", label: "Capitalization summary", placeholder: "Preferred rounds, common shares, options, SAFEs, notes", multiline: true },
+    { id: "valuationProvider", label: "Valuation provider", placeholder: "Internal estimate or third-party 409A firm" },
+  ],
+  "Board Consent — Authorize Financing": [
+    { id: "consentDate", label: "Consent date", placeholder: "Date board consent is effective" },
+    { id: "financingType", label: "Financing type", placeholder: "SAFE, convertible note, priced equity round" },
+    { id: "financingTerms", label: "Financing terms", placeholder: "Cap, discount, target raise, investor rights, closing mechanics", multiline: true },
+    { id: "approvingDirectors", label: "Approving directors", placeholder: "Names of directors approving financing" },
+  ],
+  "SAFE Side Letter": [
+    { id: "investorName", label: "Investor name", placeholder: "Investor receiving side letter" },
+    { id: "relatedSafe", label: "Related SAFE", placeholder: "SAFE date, amount, or round name" },
+    { id: "specialRights", label: "Special rights", placeholder: "Information rights, pro rata rights, MFN, observer rights, or side covenants", multiline: true },
+    { id: "expiration", label: "Expiration/termination", placeholder: "When side letter rights end, if applicable" },
+  ],
+  "Cap Table Summary": [
+    { id: "shareClasses", label: "Share classes", placeholder: "Common, preferred, options, warrants, SAFEs, notes" },
+    { id: "holders", label: "Holders and ownership", placeholder: "Founder, investor, employee, and option pool ownership", multiline: true },
+    { id: "optionPool", label: "Option pool", placeholder: "Authorized, granted, and remaining option pool" },
+    { id: "asOfDate", label: "As-of date", placeholder: "Date the cap table summary is current" },
+  ],
+  "Stockholder Written Consent": [
+    { id: "consentDate", label: "Consent date", placeholder: "Date written consent is effective" },
+    { id: "stockholders", label: "Consenting stockholders", placeholder: "Names/classes/shares of stockholders signing", multiline: true },
+    { id: "approvalMatters", label: "Approval matters", placeholder: "Actions requiring stockholder approval" },
+    { id: "votingThreshold", label: "Voting threshold", placeholder: "Majority, supermajority, class vote, or unanimous consent" },
+  ],
+  "Closing Board Consent": [
+    { id: "closingDate", label: "Closing date", placeholder: "Expected or actual financing closing date" },
+    { id: "finalInvestors", label: "Final investors", placeholder: "Investor names and amounts", multiline: true },
+    { id: "closingDeliverables", label: "Closing deliverables", placeholder: "SAFE docs, side letters, wire receipts, officer certificates" },
+    { id: "authorizedOfficer", label: "Authorized officer", placeholder: "Officer authorized to finalize and sign closing documents" },
+  ],
+  "Patents": [
+    { id: "inventionTitle", label: "Invention title", placeholder: "Short title of the invention" },
+    { id: "inventors", label: "Inventors", placeholder: "Legal names of all inventors" },
+    { id: "technicalSummary", label: "Technical summary", placeholder: "What the invention does, how it works, and what is novel", multiline: true },
+    { id: "filingGoal", label: "Filing goal", placeholder: "Provisional, utility, design, continuation, PCT, or office action response" },
+  ],
+  "Trademarks": [
+    { id: "markName", label: "Mark name", placeholder: "Word mark, logo, slogan, or product name" },
+    { id: "ownerName", label: "Owner/applicant", placeholder: "Legal owner of the mark" },
+    { id: "goodsServices", label: "Goods and services", placeholder: "Products/services the mark is used with", multiline: true },
+    { id: "firstUse", label: "First use details", placeholder: "First use date, first commerce date, or intent-to-use" },
+  ],
+  "Contracts": [
+    { id: "contractType", label: "Contract type", placeholder: "MSA, SOW, NDA, services agreement, license, vendor agreement" },
+    { id: "counterparty", label: "Counterparty", placeholder: "Other party name and role" },
+    { id: "commercialTerms", label: "Commercial terms", placeholder: "Fees, deliverables, timeline, renewal, termination, liability, IP ownership", multiline: true },
+    { id: "approvalNeeds", label: "Review focus", placeholder: "Clauses to draft, review, negotiate, or flag" },
+  ],
+  "Privacy & Compliance": [
+    { id: "productWebsite", label: "Product or website", placeholder: "Website, app, or product being reviewed" },
+    { id: "dataPractices", label: "Data practices", placeholder: "Personal data collected, sources, vendors, transfers, retention", multiline: true },
+    { id: "applicableLaws", label: "Applicable laws", placeholder: "GDPR, CCPA/CPRA, HIPAA, COPPA, SOC 2, state privacy laws" },
+    { id: "complianceGoal", label: "Compliance goal", placeholder: "Policy draft, gap analysis, checklist, DPA, consent flow" },
+  ],
+  "Startup Docs": [
+    { id: "startupStage", label: "Startup stage", placeholder: "Idea, incorporated, pre-seed, seed, scaling" },
+    { id: "docNeeded", label: "Document needed", placeholder: "Founder agreement, equity grant, SAFE, board consent, hiring doc" },
+    { id: "stakeholders", label: "Stakeholders", placeholder: "Founders, employees, investors, advisors, board members" },
+    { id: "startupTerms", label: "Key startup terms", placeholder: "Equity, vesting, financing, governance, IP, employment, advisory terms", multiline: true },
+  ],
+  "Business Formation": [
+    { id: "entityType", label: "Entity type", placeholder: "Delaware C-Corp, LLC, partnership, nonprofit" },
+    { id: "owners", label: "Owners/founders", placeholder: "Names and ownership percentages", multiline: true },
+    { id: "formationState", label: "Formation state", placeholder: "e.g. Delaware, California, Wyoming" },
+    { id: "formationNeeds", label: "Formation needs", placeholder: "Articles, bylaws, operating agreement, EIN, registered agent, initial consents" },
+  ],
+  "Intellectual Property": [
+    { id: "ipType", label: "IP type", placeholder: "Patent, trademark, copyright, trade secret, license, assignment" },
+    { id: "owner", label: "IP owner", placeholder: "Current or intended owner" },
+    { id: "ipAssets", label: "IP assets", placeholder: "Inventions, marks, works, code, datasets, domains, or know-how", multiline: true },
+    { id: "ipGoal", label: "Goal", placeholder: "Protect, assign, license, enforce, commercialize, or review risk" },
+  ],
+  "Corporate Law": [
+    { id: "corporateAction", label: "Corporate action", placeholder: "Board consent, stock issuance, officer appointment, merger, amendment" },
+    { id: "approvingParties", label: "Approving parties", placeholder: "Board, stockholders, officers, managers, members" },
+    { id: "corporateTerms", label: "Corporate terms", placeholder: "Actions, approvals, authority, effective dates, governance constraints", multiline: true },
+    { id: "entityDetails", label: "Entity details", placeholder: "Entity type, state, file number, current governance docs" },
+  ],
+  "Employment Law": [
+    { id: "workerName", label: "Worker or candidate", placeholder: "Employee, contractor, advisor, or candidate name" },
+    { id: "workerRole", label: "Role and classification", placeholder: "Title plus employee/contractor/exempt/non-exempt status" },
+    { id: "employmentTerms", label: "Employment terms", placeholder: "Compensation, duties, term, confidentiality, IP, restrictive covenants", multiline: true },
+    { id: "workLocation", label: "Work location", placeholder: "State/country and remote/hybrid/on-site" },
+  ],
+  "Real Estate": [
+    { id: "propertyAddress", label: "Property address", placeholder: "Street address or legal description" },
+    { id: "transactionType", label: "Transaction type", placeholder: "Lease, purchase, sale, sublease, license, amendment" },
+    { id: "parties", label: "Parties", placeholder: "Landlord/seller, tenant/buyer, broker, guarantor" },
+    { id: "realEstateTerms", label: "Deal terms", placeholder: "Rent/price, term, deposits, contingencies, use, maintenance, closing items", multiline: true },
+  ],
+  "Immigration": [
+    { id: "beneficiary", label: "Beneficiary", placeholder: "Person needing immigration support" },
+    { id: "immigrationCategory", label: "Visa or filing type", placeholder: "H-1B, O-1, L-1, TN, PERM, I-9, visitor, founder visa" },
+    { id: "sponsor", label: "Sponsor or employer", placeholder: "Company or person sponsoring/supporting filing" },
+    { id: "immigrationFacts", label: "Immigration facts", placeholder: "Role, credentials, nationality, deadlines, status, travel, dependents", multiline: true },
+  ],
+  "Tax Law": [
+    { id: "taxMatter", label: "Tax matter", placeholder: "Income tax, sales tax, payroll, franchise tax, 83(b), 1099, nexus" },
+    { id: "taxJurisdictions", label: "Tax jurisdictions", placeholder: "Federal, state, local, or international jurisdictions" },
+    { id: "taxPeriod", label: "Tax period", placeholder: "Year, quarter, filing deadline, or transaction date" },
+    { id: "taxFacts", label: "Tax facts", placeholder: "Amounts, entity type, transactions, employees, contractors, revenue, deductions", multiline: true },
+  ],
+  "Litigation Support": [
+    { id: "matterType", label: "Matter type", placeholder: "Demand letter, dispute summary, discovery, settlement, complaint response" },
+    { id: "opposingParty", label: "Opposing party", placeholder: "Other party or counsel" },
+    { id: "timeline", label: "Key timeline", placeholder: "Important dates, events, notices, deadlines", multiline: true },
+    { id: "desiredOutcome", label: "Desired outcome", placeholder: "Payment, dismissal, settlement, compliance, injunction, document review" },
+  ],
+  "Securities": [
+    { id: "transactionType", label: "Securities transaction", placeholder: "SAFE, note, equity financing, option grant, secondary sale" },
+    { id: "investorsOrHolders", label: "Investors or holders", placeholder: "Investor names, stockholders, option holders, purchasers" },
+    { id: "securitiesTerms", label: "Securities terms", placeholder: "Amount, valuation, cap, discount, share class, exemptions, disclosures", multiline: true },
+    { id: "complianceBasis", label: "Compliance basis", placeholder: "Reg D, Rule 701, state blue sky, board/stockholder approvals" },
+  ],
 };
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -218,8 +416,11 @@ export function Documents() {
   const params = new URLSearchParams(search);
   const prefillType = params.get("type") ?? "";
 
-  const prefillDoc = prefillType
+  const matchedPrefillDoc = prefillType
     ? sampleDocs.find(d => d.title.toLowerCase() === prefillType.toLowerCase())
+    : null;
+  const prefillDoc = prefillType
+    ? matchedPrefillDoc ?? { title: prefillType, category: documentFields[prefillType] ? "Service" : "Custom" }
     : null;
 
   const [selectedDoc, setSelectedDoc] = useState<DocumentTemplate | null>(prefillDoc ?? null);
