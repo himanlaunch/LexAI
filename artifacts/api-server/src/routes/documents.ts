@@ -31,6 +31,308 @@ function cleanUrl(value: unknown) {
   return typeof value === "string" ? value.trim().slice(0, 1000) : "";
 }
 
+function cleanLongText(value: unknown) {
+  return typeof value === "string" ? value.trim().slice(0, 120_000) : "";
+}
+
+function slugifyFilename(value: string, fallback = "agentlamy-document") {
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || fallback
+  );
+}
+
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function escapePdfText(value: string) {
+  return value
+    .replace(/[^\x09\x0a\x0d\x20-\xff]/g, "?")
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)");
+}
+
+function stripLightMarkdown(value: string) {
+  return value
+    .replace(/^---+$/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__(.*?)__/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .trim();
+}
+
+function wrapText(value: string, maxChars: number) {
+  const wrapped: string[] = [];
+
+  for (const rawLine of value.replace(/\r\n/g, "\n").split("\n")) {
+    const line = rawLine.trimEnd();
+
+    if (!line) {
+      wrapped.push("");
+      continue;
+    }
+
+    let current = "";
+
+    for (const word of line.split(/\s+/)) {
+      if (!current) {
+        current = word;
+      } else if (`${current} ${word}`.length <= maxChars) {
+        current = `${current} ${word}`;
+      } else {
+        wrapped.push(current);
+        current = word;
+      }
+    }
+
+    if (current) wrapped.push(current);
+  }
+
+  return wrapped;
+}
+
+function makeCrcTable() {
+  const table = new Uint32Array(256);
+
+  for (let i = 0; i < 256; i += 1) {
+    let crc = i;
+    for (let j = 0; j < 8; j += 1) {
+      crc = crc & 1 ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
+    }
+    table[i] = crc >>> 0;
+  }
+
+  return table;
+}
+
+const crcTable = makeCrcTable();
+
+function crc32(buffer: Buffer) {
+  let crc = 0xffffffff;
+
+  for (const byte of buffer) {
+    crc = crcTable[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  }
+
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function dosDateTime(date = new Date()) {
+  const time = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
+  const dosDate = ((date.getFullYear() - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
+  return { time, date: dosDate };
+}
+
+function createZip(files: Array<{ name: string; content: string | Buffer }>) {
+  const localParts: Buffer[] = [];
+  const centralParts: Buffer[] = [];
+  let offset = 0;
+  const timestamp = dosDateTime();
+
+  for (const file of files) {
+    const name = Buffer.from(file.name, "utf8");
+    const data = Buffer.isBuffer(file.content) ? file.content : Buffer.from(file.content, "utf8");
+    const crc = crc32(data);
+
+    const localHeader = Buffer.alloc(30);
+    localHeader.writeUInt32LE(0x04034b50, 0);
+    localHeader.writeUInt16LE(20, 4);
+    localHeader.writeUInt16LE(0x0800, 6);
+    localHeader.writeUInt16LE(0, 8);
+    localHeader.writeUInt16LE(timestamp.time, 10);
+    localHeader.writeUInt16LE(timestamp.date, 12);
+    localHeader.writeUInt32LE(crc, 14);
+    localHeader.writeUInt32LE(data.length, 18);
+    localHeader.writeUInt32LE(data.length, 22);
+    localHeader.writeUInt16LE(name.length, 26);
+    localHeader.writeUInt16LE(0, 28);
+
+    localParts.push(localHeader, name, data);
+
+    const centralHeader = Buffer.alloc(46);
+    centralHeader.writeUInt32LE(0x02014b50, 0);
+    centralHeader.writeUInt16LE(20, 4);
+    centralHeader.writeUInt16LE(20, 6);
+    centralHeader.writeUInt16LE(0x0800, 8);
+    centralHeader.writeUInt16LE(0, 10);
+    centralHeader.writeUInt16LE(timestamp.time, 12);
+    centralHeader.writeUInt16LE(timestamp.date, 14);
+    centralHeader.writeUInt32LE(crc, 16);
+    centralHeader.writeUInt32LE(data.length, 20);
+    centralHeader.writeUInt32LE(data.length, 24);
+    centralHeader.writeUInt16LE(name.length, 28);
+    centralHeader.writeUInt16LE(0, 30);
+    centralHeader.writeUInt16LE(0, 32);
+    centralHeader.writeUInt16LE(0, 34);
+    centralHeader.writeUInt16LE(0, 36);
+    centralHeader.writeUInt32LE(0, 38);
+    centralHeader.writeUInt32LE(offset, 42);
+
+    centralParts.push(centralHeader, name);
+    offset += localHeader.length + name.length + data.length;
+  }
+
+  const centralDirectory = Buffer.concat(centralParts);
+  const localFiles = Buffer.concat(localParts);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(0, 4);
+  end.writeUInt16LE(0, 6);
+  end.writeUInt16LE(files.length, 8);
+  end.writeUInt16LE(files.length, 10);
+  end.writeUInt32LE(centralDirectory.length, 12);
+  end.writeUInt32LE(localFiles.length, 16);
+  end.writeUInt16LE(0, 20);
+
+  return Buffer.concat([localFiles, centralDirectory, end]);
+}
+
+function createDocx(title: string, content: string) {
+  const paragraphs = stripLightMarkdown(content)
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map(line => line.trimEnd());
+  const paragraphXml = paragraphs
+    .map(line => {
+      if (!line.trim()) return "<w:p/>";
+      return `<w:p><w:r><w:t xml:space="preserve">${escapeXml(line)}</w:t></w:r></w:p>`;
+    })
+    .join("");
+
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p>
+      <w:r>
+        <w:rPr><w:b/><w:sz w:val="32"/></w:rPr>
+        <w:t>${escapeXml(title)}</w:t>
+      </w:r>
+    </w:p>
+    ${paragraphXml}
+    <w:sectPr>
+      <w:pgSz w:w="12240" w:h="15840"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  return createZip([
+    {
+      name: "[Content_Types].xml",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>`,
+    },
+    {
+      name: "_rels/.rels",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`,
+    },
+    {
+      name: "word/_rels/document.xml.rels",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>`,
+    },
+    { name: "word/document.xml", content: documentXml },
+    {
+      name: "docProps/core.xml",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>${escapeXml(title)}</dc:title>
+  <dc:creator>Agentlamy</dc:creator>
+  <cp:lastModifiedBy>Agentlamy</cp:lastModifiedBy>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString()}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${new Date().toISOString()}</dcterms:modified>
+</cp:coreProperties>`,
+    },
+    {
+      name: "docProps/app.xml",
+      content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>Agentlamy</Application>
+</Properties>`,
+    },
+  ]);
+}
+
+function createPdf(title: string, content: string) {
+  const titleLines = wrapText(title, 72);
+  const bodyLines = wrapText(stripLightMarkdown(content), 88);
+  const allLines = [...titleLines, "", ...bodyLines];
+  const linesPerPage = 48;
+  const pages: string[][] = [];
+
+  for (let i = 0; i < allLines.length; i += linesPerPage) {
+    pages.push(allLines.slice(i, i + linesPerPage));
+  }
+
+  const objects: string[] = [];
+  objects.push("<< /Type /Catalog /Pages 2 0 R >>");
+  const pageObjectIds = pages.map((_, index) => 3 + index * 2);
+  const fontObjectId = 3 + pages.length * 2;
+  objects.push(`<< /Type /Pages /Kids [${pageObjectIds.map(id => `${id} 0 R`).join(" ")}] /Count ${pages.length} >>`);
+
+  pages.forEach((pageLines, index) => {
+    const pageObjectId = pageObjectIds[index];
+    const contentObjectId = pageObjectId + 1;
+    const streamLines = pageLines.map(line => `(${escapePdfText(line)}) Tj T*`).join("\n");
+    const stream = `BT
+/F1 11 Tf
+50 760 Td
+14 TL
+${streamLines}
+ET`;
+    objects[pageObjectId - 1] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontObjectId} 0 R >> >> /Contents ${contentObjectId} 0 R >>`;
+    objects[contentObjectId - 1] = `<< /Length ${Buffer.byteLength(stream, "utf8")} >>
+stream
+${stream}
+endstream`;
+  });
+
+  objects[fontObjectId - 1] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
+
+  const chunks: string[] = ["%PDF-1.4\n"];
+  const offsets: number[] = [0];
+  let position = Buffer.byteLength(chunks[0], "utf8");
+
+  objects.forEach((object, index) => {
+    offsets.push(position);
+    const chunk = `${index + 1} 0 obj\n${object}\nendobj\n`;
+    chunks.push(chunk);
+    position += Buffer.byteLength(chunk, "utf8");
+  });
+
+  const xrefOffset = position;
+  const xref = [
+    `xref\n0 ${objects.length + 1}\n`,
+    "0000000000 65535 f \n",
+    ...offsets.slice(1).map(offset => `${offset.toString().padStart(10, "0")} 00000 n \n`),
+    `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`,
+  ].join("");
+  chunks.push(xref);
+
+  return Buffer.from(chunks.join(""), "utf8");
+}
+
 function getAzureConfig(): AiConfig | null {
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT?.replace(/\/+$/, "");
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
@@ -366,6 +668,46 @@ router.post("/documents/research-url", async (req: Request, res: Response) => {
       error: "Website research failed",
       details: error instanceof Error ? error.message : "Unable to research this website",
     });
+  }
+});
+
+router.post("/documents/export", (req: Request, res: Response) => {
+  const format = cleanText(req.body?.format).toLowerCase();
+  const title = cleanText(req.body?.title, "Agentlamy Document") || "Agentlamy Document";
+  const content = cleanLongText(req.body?.content);
+
+  if (!content) {
+    return res.status(400).json({ error: "content is required" });
+  }
+
+  if (!["docx", "pdf"].includes(format)) {
+    return res.status(400).json({ error: "format must be docx or pdf" });
+  }
+
+  try {
+    const filename = `${slugifyFilename(title)}.${format}`;
+    const file =
+      format === "docx"
+        ? {
+            buffer: createDocx(title, content),
+            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          }
+        : {
+            buffer: createPdf(title, content),
+            contentType: "application/pdf",
+          };
+
+    req.log.info({ route: "/api/documents/export", format, bytes: file.buffer.length }, "document export created");
+    res.setHeader("Content-Type", file.contentType);
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Length", file.buffer.length.toString());
+    return res.send(file.buffer);
+  } catch (error) {
+    req.log.error(
+      { route: "/api/documents/export", format, error: error instanceof Error ? error.message : String(error) },
+      "document export failed",
+    );
+    return res.status(500).json({ error: "Document export failed" });
   }
 });
 

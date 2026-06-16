@@ -35,6 +35,8 @@ type GenerationOverrides = {
   additionalContext?: string;
 };
 
+type DownloadFormat = "txt" | "docx" | "pdf";
+
 const sampleDocs: DocumentTemplate[] = [
   { title: "Non-Disclosure Agreement", category: "Contracts" },
   { title: "Offer Letter", category: "Employment" },
@@ -229,14 +231,43 @@ export function Documents() {
     await navigator.clipboard?.writeText(generatedDocument.content);
   }
 
-  function downloadDraft() {
+  async function downloadDraft(format: DownloadFormat) {
     if (!generatedDocument) return;
 
-    const blob = new Blob([generatedDocument.content], { type: "text/plain;charset=utf-8" });
+    const baseName = generatedDocument.documentType.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "document";
+
+    if (format === "txt") {
+      const blob = new Blob([generatedDocument.content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${baseName}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
+
+    const response = await fetch("/api/documents/export", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        format,
+        title: generatedDocument.documentType,
+        content: generatedDocument.content,
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => null) as { error?: string } | null;
+      setGenerationError(data?.error || `Unable to export ${format.toUpperCase()} file.`);
+      return;
+    }
+
+    const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${generatedDocument.documentType.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "document"}.txt`;
+    link.download = `${baseName}.${format}`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -466,8 +497,14 @@ export function Documents() {
                   <button onClick={() => void copyDraft()} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: SYS, fontSize: 13, fontWeight: 600, color: C.blue, backgroundColor: "transparent", border: `1px solid ${C.blue}`, borderRadius: 980, padding: "8px 12px", cursor: "pointer" }} data-testid="btn-copy-draft">
                     <Copy size={14} /> Copy
                   </button>
-                  <button onClick={downloadDraft} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: SYS, fontSize: 13, fontWeight: 600, color: C.white, backgroundColor: C.blue, border: `1px solid ${C.blue}`, borderRadius: 980, padding: "8px 12px", cursor: "pointer" }} data-testid="btn-download-draft">
-                    <Download size={14} /> Download
+                  <button onClick={() => void downloadDraft("txt")} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: SYS, fontSize: 13, fontWeight: 600, color: C.blue, backgroundColor: "transparent", border: `1px solid ${C.blue}`, borderRadius: 980, padding: "8px 12px", cursor: "pointer" }} data-testid="btn-download-txt">
+                    <Download size={14} /> TXT
+                  </button>
+                  <button onClick={() => void downloadDraft("docx")} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: SYS, fontSize: 13, fontWeight: 600, color: C.white, backgroundColor: C.blue, border: `1px solid ${C.blue}`, borderRadius: 980, padding: "8px 12px", cursor: "pointer" }} data-testid="btn-download-docx">
+                    <Download size={14} /> DOCX
+                  </button>
+                  <button onClick={() => void downloadDraft("pdf")} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: SYS, fontSize: 13, fontWeight: 600, color: C.white, backgroundColor: C.dark, border: `1px solid ${C.dark}`, borderRadius: 980, padding: "8px 12px", cursor: "pointer" }} data-testid="btn-download-pdf">
+                    <Download size={14} /> PDF
                   </button>
                 </div>
               </div>
