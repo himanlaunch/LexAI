@@ -59,6 +59,16 @@ export function Nav() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <Link href="/dashboard#aeo-scanner" style={{
+            fontFamily: SYS, fontSize: 13, fontWeight: 500, letterSpacing: -0.1,
+            color: C.blue, backgroundColor: "rgba(0,113,227,0.08)",
+            border: `1px solid rgba(0,113,227,0.18)`, borderRadius: 980, padding: "6px 14px",
+            cursor: "pointer", textDecoration: "none", transition: "background-color 0.2s",
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(0,113,227,0.13)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(0,113,227,0.08)"; }}
+            data-testid="btn-aeo-scanner"
+          >AEO</Link>
           {user ? (
             <button
               type="button"
@@ -90,6 +100,7 @@ export function Nav() {
         @media (max-width: 420px) {
           .brand-text { font-size: 14px !important; }
           nav [data-testid="btn-get-started"] { padding: 6px 12px !important; }
+          nav [data-testid="btn-aeo-scanner"] { padding: 6px 10px !important; }
         }
         @media (max-width: 360px) {
           .brand-text { display: none !important; }

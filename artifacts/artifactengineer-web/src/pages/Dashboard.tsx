@@ -74,7 +74,9 @@ export function Dashboard() {
             ))}
           </div>
 
-          <ImportedAeoScanner />
+          <div id="aeo-scanner" style={{ scrollMarginTop: 88 }}>
+            <ImportedAeoScanner />
+          </div>
 
           {/* Compliance Calendar entry card */}
           <div style={{ marginBottom: 36 }}>
