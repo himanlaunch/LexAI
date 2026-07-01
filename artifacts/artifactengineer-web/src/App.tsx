@@ -9,6 +9,8 @@ import { Documents } from "@/pages/Documents";
 import { Dashboard } from "@/pages/Dashboard";
 import { Compliance } from "@/pages/Compliance";
 import { Fundraising } from "@/pages/Fundraising";
+import { Auth } from "@/pages/Auth";
+import { AuthProvider } from "@/lib/auth";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,7 @@ function Router() {
       <Route path="/services" component={Services} />
       <Route path="/documents" component={Documents} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/auth" component={Auth} />
       <Route path="/compliance" component={Compliance} />
       <Route path="/fundraising" component={Fundraising} />
       <Route component={NotFound} />
@@ -30,9 +33,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
+        <AuthProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+        </AuthProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

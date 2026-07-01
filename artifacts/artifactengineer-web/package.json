@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/agentlamy-web",
+  "name": "@workspace/artifactengineer-web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -73,5 +73,8 @@
     "vite": "catalog:",
     "wouter": "^3.3.5",
     "zod": "catalog:"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.87.1"
   }
 }

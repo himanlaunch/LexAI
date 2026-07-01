@@ -310,7 +310,7 @@ function ComplianceCard({ item }: { item: ComplianceItem }) {
           <span style={{ fontFamily: SYS, fontSize: 12, color: C.gray, letterSpacing: "-0.05px" }}>
             Law firm: <span style={{ color: C.dark, fontWeight: 500 }}>{item.lawFirmCost}</span>
           </span>
-          <span style={{ fontFamily: SYS, fontSize: 12, fontWeight: 600, color: "#34c759" }}>Agentlamy: $0</span>
+          <span style={{ fontFamily: SYS, fontSize: 12, fontWeight: 600, color: "#34c759" }}>artifactengineer: $0</span>
         </div>
       </div>
 

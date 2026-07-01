@@ -102,7 +102,7 @@ const defaultFields: CustomField[] = [
 
 const documentFields: Record<string, CustomField[]> = {
   "Non-Disclosure Agreement": [
-    { id: "disclosingParty", label: "Disclosing party", placeholder: "e.g. Agentlamy Inc. or both parties" },
+    { id: "disclosingParty", label: "Disclosing party", placeholder: "e.g. artifactengineer Inc. or both parties" },
     { id: "receivingParty", label: "Receiving party", placeholder: "e.g. Partner company or contractor name" },
     { id: "purpose", label: "Purpose of disclosure", placeholder: "e.g. product partnership discussions" },
     { id: "confidentialityTerm", label: "Confidentiality term", placeholder: "e.g. 2 years, 5 years, indefinite for trade secrets" },
@@ -132,7 +132,7 @@ const documentFields: Record<string, CustomField[]> = {
     { id: "prohibitedUses", label: "Prohibited uses", placeholder: "Activities users cannot do on the platform", multiline: true },
   ],
   "Privacy Policy": [
-    { id: "websiteApp", label: "Website or app", placeholder: "e.g. agentlamy.com" },
+    { id: "websiteApp", label: "Website or app", placeholder: "e.g. artifactengineer.com" },
     { id: "dataCollected", label: "Data collected", placeholder: "Account, billing, usage, uploaded documents, website URLs", multiline: true },
     { id: "dataSharing", label: "Data sharing", placeholder: "Processors, payment providers, analytics, AI providers" },
     { id: "privacyContact", label: "Privacy contact", placeholder: "e.g. privacy@company.com" },
@@ -629,7 +629,7 @@ export function Documents() {
                 Your Documents
               </h1>
               <p style={{ fontFamily: SYS, fontSize: 17, letterSpacing: "-0.2px", color: C.gray, maxWidth: 560, lineHeight: 1.55, margin: 0 }}>
-                Generate a first draft with Agentlamy, then review missing details before using it.
+                Generate a first draft with artifactengineer, then review missing details before using it.
               </p>
             </div>
             <button onClick={() => startDocument()} style={{
@@ -770,7 +770,7 @@ export function Documents() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
                 <div>
                   <FieldLabel>Company name</FieldLabel>
-                  <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g. Agentlamy Inc." style={inputStyle} data-testid="input-company-name" />
+                  <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g. artifactengineer Inc." style={inputStyle} data-testid="input-company-name" />
                 </div>
                 <div>
                   <FieldLabel>Jurisdiction</FieldLabel>

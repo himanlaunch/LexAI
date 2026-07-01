@@ -4,8 +4,11 @@ import { Footer } from "@/components/layout/Footer";
 import { C, SYS } from "@/lib/constants";
 import { ImportedAeoScanner } from "@/components/dashboard/ImportedAeoScanner";
 import { Activity, Clock, FileText, Calendar, ChevronRight, TrendingUp, AlertCircle, BarChart2 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 export function Dashboard() {
+  const { configured, loading, user, profile } = useAuth();
+
   return (
     <div style={{ fontFamily: SYS, overflowX: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <Nav />
@@ -20,6 +23,33 @@ export function Dashboard() {
             <p style={{ fontFamily: SYS, fontSize: 17, letterSpacing: "-0.2px", color: C.gray, maxWidth: 540, lineHeight: 1.55, margin: 0 }}>
               Overview of your legal matters, generated documents, and accumulated savings.
             </p>
+          </div>
+
+          <div style={{
+            backgroundColor: C.white, borderRadius: 16, padding: "22px 24px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.03)", border: `1px solid ${C.border}`,
+            marginBottom: 24,
+          }}>
+            <div style={{ fontFamily: SYS, fontSize: 16, fontWeight: 600, color: C.dark, marginBottom: 6 }}>
+              Supabase account
+            </div>
+            <div style={{ fontFamily: SYS, fontSize: 14, color: C.gray, lineHeight: 1.5 }}>
+              {!configured
+                ? "Supabase is linked, but the public auth keys are not available to this build yet."
+                : loading
+                  ? "Checking your Supabase session..."
+                  : user
+                    ? `Signed in as ${profile?.email || user.email || "your Supabase user"}. Profile sync is connected to Supabase Postgres.`
+                    : "Sign in to connect your dashboard to Supabase Auth and Supabase Postgres."}
+            </div>
+            {!user && configured && !loading ? (
+              <Link href="/auth" style={{
+                display: "inline-block", marginTop: 14, fontFamily: SYS, fontSize: 14, fontWeight: 500,
+                color: C.white, backgroundColor: C.blue, borderRadius: 980, padding: "8px 18px", textDecoration: "none",
+              }}>
+                Sign In
+              </Link>
+            ) : null}
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 48 }}>

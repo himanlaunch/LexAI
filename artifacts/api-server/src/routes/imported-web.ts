@@ -28,7 +28,7 @@ async function fetchText(url: string) {
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "user-agent": "StartupLegal-AI-AEO-Scanner/1.0",
+        "user-agent": "artifactengineer-AEO-Scanner/1.0",
       },
     });
 

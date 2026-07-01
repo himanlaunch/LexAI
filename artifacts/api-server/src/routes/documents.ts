@@ -35,7 +35,7 @@ function cleanLongText(value: unknown) {
   return typeof value === "string" ? value.trim().slice(0, 120_000) : "";
 }
 
-function slugifyFilename(value: string, fallback = "agentlamy-document") {
+function slugifyFilename(value: string, fallback = "artifactengineer-document") {
   return (
     value
       .toLowerCase()
@@ -260,8 +260,8 @@ function createDocx(title: string, content: string) {
       content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <dc:title>${escapeXml(title)}</dc:title>
-  <dc:creator>Agentlamy</dc:creator>
-  <cp:lastModifiedBy>Agentlamy</cp:lastModifiedBy>
+  <dc:creator>artifactengineer</dc:creator>
+  <cp:lastModifiedBy>artifactengineer</cp:lastModifiedBy>
   <dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString()}</dcterms:created>
   <dcterms:modified xsi:type="dcterms:W3CDTF">${new Date().toISOString()}</dcterms:modified>
 </cp:coreProperties>`,
@@ -270,7 +270,7 @@ function createDocx(title: string, content: string) {
       name: "docProps/app.xml",
       content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-  <Application>Agentlamy</Application>
+  <Application>artifactengineer</Application>
 </Properties>`,
     },
   ]);
@@ -509,7 +509,7 @@ async function fetchWebsitePage(url: string) {
   const response = await fetch(url, {
     headers: {
       Accept: "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5",
-      "User-Agent": "AgentlamyDocumentResearch/1.0",
+      "User-Agent": "artifactengineerDocumentResearch/1.0",
     },
     signal: AbortSignal.timeout(12_000),
   });
@@ -675,7 +675,7 @@ router.post("/documents/research-url", async (req: Request, res: Response) => {
 
 router.post("/documents/export", (req: Request, res: Response) => {
   const format = cleanText(req.body?.format).toLowerCase();
-  const title = cleanText(req.body?.title, "Agentlamy Document") || "Agentlamy Document";
+  const title = cleanText(req.body?.title, "artifactengineer Document") || "artifactengineer Document";
   const content = cleanLongText(req.body?.content);
 
   if (!content) {

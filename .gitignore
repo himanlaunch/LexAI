@@ -54,3 +54,4 @@ Thumbs.db
 attached_assets/screenshots/
 
 .vercel
+.env*.local

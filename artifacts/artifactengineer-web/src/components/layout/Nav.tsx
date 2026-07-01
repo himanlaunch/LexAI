@@ -1,9 +1,11 @@
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { C, SYS } from "@/lib/constants";
+import { useAuth } from "@/lib/auth";
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const { user, signOut } = useAuth();
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
@@ -25,7 +27,7 @@ export function Nav() {
             <rect width="32" height="32" rx="6" fill={C.dark} />
             <path d="M8 24L13 8h2l3 10 3-10h2l5 16h-3l-3-10-3 10h-2l-3-10-3 10H8z" fill="white" />
           </svg>
-          <span style={{ fontFamily: SYS, fontWeight: 600, fontSize: 17, color: C.dark, letterSpacing: -0.3 }}>Agentlamy</span>
+          <span className="brand-text" style={{ fontFamily: SYS, fontWeight: 600, fontSize: 17, color: C.dark, letterSpacing: -0.3 }}>artifactengineer</span>
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 32 }} className="hidden-mobile">
@@ -57,7 +59,18 @@ export function Nav() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <Link href="/dashboard" style={{ fontFamily: SYS, fontSize: 13, color: C.blue, textDecoration: "none", fontWeight: 400, letterSpacing: -0.1 }} data-testid="link-login">Log In</Link>
+          {user ? (
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              style={{ fontFamily: SYS, fontSize: 13, color: C.blue, background: "transparent", border: 0, padding: 0, cursor: "pointer", fontWeight: 400, letterSpacing: -0.1 }}
+              data-testid="btn-logout"
+            >
+              Log Out
+            </button>
+          ) : (
+            <Link href="/auth" style={{ fontFamily: SYS, fontSize: 13, color: C.blue, textDecoration: "none", fontWeight: 400, letterSpacing: -0.1 }} data-testid="link-login">Log In</Link>
+          )}
           <Link href="/documents" style={{
             fontFamily: SYS, fontSize: 13, fontWeight: 400, letterSpacing: -0.1,
             color: C.white, backgroundColor: C.blue,
@@ -74,6 +87,13 @@ export function Nav() {
 
       <style>{`
         @media (max-width: 640px) { .hidden-mobile { display: none !important; } }
+        @media (max-width: 420px) {
+          .brand-text { font-size: 14px !important; }
+          nav [data-testid="btn-get-started"] { padding: 6px 12px !important; }
+        }
+        @media (max-width: 360px) {
+          .brand-text { display: none !important; }
+        }
       `}</style>
     </nav>
   );

@@ -28,12 +28,12 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 
 ## Artifacts
 
-### Agentlamy Web (`artifacts/agentlamy-web`)
+### artifactengineer Web (`artifacts/artifactengineer-web`)
 - **Type**: React + Vite SPA
 - **Preview path**: `/` (root)
-- **Workflow**: `Agentlamy` — runs on port 5000 via `cd artifacts/agentlamy-web && PORT=5000 BASE_PATH=/ node_modules/.bin/vite --config vite.config.ts --host 0.0.0.0`
+- **Workflow**: `artifactengineer` — runs on port 5000 via `cd artifacts/artifactengineer-web && PORT=5000 BASE_PATH=/ node_modules/.bin/vite --config vite.config.ts --host 0.0.0.0`
 - **Routes**:
-  - `/` — Landing page (faithful reproduction of the Agentlamy mockup)
+  - `/` — Landing page (faithful reproduction of the artifactengineer mockup)
   - `/services` — All legal services grid + practice areas
   - `/documents` — Document templates with Generate buttons
   - `/dashboard` — Stats cards and recent activity
@@ -48,7 +48,7 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 ### Mockup Sandbox (`artifacts/mockup-sandbox`)
 - **Type**: Design mockup sandbox
 - **Preview path**: `/__mockup`
-- Contains the original Agentlamy landing page mockup at `src/components/mockups/agentlamy-landing/LandingPage.tsx`
+- Contains the original artifactengineer landing page mockup at `src/components/mockups/artifactengineer-landing/LandingPage.tsx`
 
 ### API Server (`artifacts/api-server`)
 - **Type**: Express 5 API
@@ -57,5 +57,5 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 
 ## Notes
 
-- The Agentlamy workflow uses direct Vite invocation (`node_modules/.bin/vite`) instead of `pnpm run dev` to work around a port detection issue with the platform's workflow health checker when using pnpm filter.
-- The artifact.toml for agentlamy-web is set to port 5000, matching the Agentlamy workflow.
+- The artifactengineer workflow uses direct Vite invocation (`node_modules/.bin/vite`) instead of `pnpm run dev` to work around a port detection issue with the platform's workflow health checker when using pnpm filter.
+- The artifact.toml for artifactengineer-web is set to port 5000, matching the artifactengineer workflow.

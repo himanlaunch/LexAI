@@ -56,8 +56,8 @@ const serviceFields: Record<ServiceKey, { title: string; subtitle: string; field
     title: "Trademark Application",
     subtitle: "We'll run a clearance search and prepare a complete USPTO trademark application.",
     fields: [
-      { id: "mark",   label: "Mark Name",            placeholder: "e.g. Agentlamy", type: "text" },
-      { id: "owner",  label: "Owner / Applicant",    placeholder: "e.g. Agentlamy Inc.", type: "text" },
+      { id: "mark",   label: "Mark Name",            placeholder: "e.g. artifactengineer", type: "text" },
+      { id: "owner",  label: "Owner / Applicant",    placeholder: "e.g. artifactengineer Inc.", type: "text" },
       { id: "goods",  label: "Goods & Services",     placeholder: "e.g. AI-powered legal document software, Class 42", type: "text" },
       { id: "use",    label: "Use Status",            placeholder: "",  type: "select", options: ["Already in use in commerce", "Intent to use"] },
     ],
