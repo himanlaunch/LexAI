@@ -357,6 +357,24 @@ function getAzureConfig(): AiConfig | null {
   };
 }
 
+function getDigitalOceanConfig(): AiConfig | null {
+  const apiKey = process.env.DIGITALOCEAN_TOKEN || process.env.DIGITALOCEAN_API_KEY;
+  if (!apiKey) return null;
+
+  const baseUrl = process.env.DIGITALOCEAN_INFERENCE_BASE_URL?.replace(/\/+$/, "") || "https://inference.do-ai.run/v1";
+  const model = process.env.DIGITALOCEAN_MODEL || "kimi-k2.6";
+
+  return {
+    url: `${baseUrl}/chat/completions`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    model,
+    provider: "digitalocean",
+  };
+}
+
 function getOpenAIConfig(): AiConfig | null {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
@@ -376,7 +394,7 @@ function getOpenAIConfig(): AiConfig | null {
 }
 
 function getAiConfig() {
-  return getAzureConfig() || getOpenAIConfig();
+  return getDigitalOceanConfig() || getAzureConfig() || getOpenAIConfig();
 }
 
 async function callAi(aiConfig: AiConfig, messages: ChatMessage[], maxTokens: number, temperature = 0.2) {
@@ -584,7 +602,7 @@ router.post("/documents/research-url", async (req: Request, res: Response) => {
     return res.status(503).json({
       error: "Website research is not configured",
       details:
-        "Add AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, and AZURE_OPENAI_DEPLOYMENT, or add OPENAI_API_KEY to this Vercel project production environment.",
+        "Add DIGITALOCEAN_TOKEN and DIGITALOCEAN_MODEL, or configure Azure OpenAI/OpenAI fallback variables in this Vercel project production environment.",
     });
   }
 
@@ -728,7 +746,7 @@ router.post("/documents/generate", async (req: Request, res: Response) => {
     return res.status(503).json({
       error: "Document generation is not configured",
       details:
-        "Add AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, and AZURE_OPENAI_DEPLOYMENT, or add OPENAI_API_KEY to this Vercel project production environment.",
+        "Add DIGITALOCEAN_TOKEN and DIGITALOCEAN_MODEL, or configure Azure OpenAI/OpenAI fallback variables in this Vercel project production environment.",
     });
   }
 
